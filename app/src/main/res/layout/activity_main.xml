@@ -19,7 +19,7 @@
         android:text=""
         android:textAlignment="textEnd"
         android:textColor="@color/white"
-        android:textSize="32dp" />
+        android:textSize="32sp" />
 
     <TextView
         android:id="@+id/result_tv"
@@ -33,7 +33,7 @@
         android:text="0"
         android:textAlignment="textEnd"
         android:textColor="@color/white"
-        android:textSize="64dp" />
+        android:textSize="64sp" />
 
     <LinearLayout
         android:id="@+id/buttons_layout"
