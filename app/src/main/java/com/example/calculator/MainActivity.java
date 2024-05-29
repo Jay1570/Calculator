@@ -4,13 +4,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    char []s=new char[50];
-    double []e=new double[50];
     public TextView result,solution;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,16 +64,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else{
             cal=cal+btext;
         }
-        String result1=getresult(cal);
+        String result1=getResult(cal);
         if(!result1.equals("Err"))
             result.setText(result1);
         solution.setText(cal);
     }
-    String getresult(String d){
-        Evaluate e1 = new Evaluate();
+
+    @VisibleForTesting
+    public static String getResult(String d){
+        Stack<Double> e1 = new Stack<>();
         double op1, op2, r = 0;
         StringBuilder temp = new StringBuilder();
-        Stack st=new Stack();
+        Stack<Character> st=new Stack<>();
         char []in= d.toCharArray();
         char []post=new char[in.length*2];
         int j=0;
@@ -82,17 +83,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             switch (c) {
                 case '(' -> st.push(c);
                 case '+', '-', '*', '/' -> {
-                    while (st.top>-1&&st.priority(s[st.top]) >= st.priority(c)) {
+                    while (!st.isEmpty() && st.priority((char)st.getTop()) >= st.priority(c)) {
                         post[j++] = ' ';
-                        post[j++] = st.pop();
+                        post[j++] = (char)st.pop();
                     }
                     post[j++] = ' ';
                     st.push(c);
                 }
                 case ')' -> {
-                    while (s[st.top] != '(') {
+                    while ((char)st.getTop() != '(') {
                         post[j++] = ' ';
-                        post[j++] = st.pop();
+                        post[j++] = (char)st.pop();
                     }
                     post[j++] = ' ';
                     st.pop();
@@ -100,39 +101,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 default -> post[j++] = c;
             }
         }
-        while(st.top>-1) {
+        while(!(st.isEmpty())) {
             post[j++] = ' ';
-            post[j++] = st.pop();
+            post[j++] = (char)st.pop();
         }
         try {
             for (char c : post) {
                 switch (c) {
                     case '*' -> {
-                        op2 = e1.pop();
-                        op1 = e1.pop();
+                        op2 = (double) e1.pop();
+                        op1 = (double)e1.pop();
                         r = op1 * op2;
                         e1.push(r);
                     }
                     case '/' -> {
-                        op2 = e1.pop();
-                        op1 = e1.pop();
+                        op2 = (double)e1.pop();
+                        op1 = (double)e1.pop();
                         r = op1 / op2;
                         e1.push(r);
                     }
                     case '+' -> {
-                        op2 = e1.pop();
-                        op1 = e1.pop();
+                        op2 = (double) e1.pop();
+                        op1 = (double)e1.pop();
                         r = op1 + op2;
                         e1.push(r);
                     }
                     case '-' -> {
-                        op2 = e1.pop();
-                        op1 = e1.pop();
+                        op2 = (double)e1.pop();
+                        op1 = (double)e1.pop();
                         r = op1 - op2;
                         e1.push(r);
                     }
                     case ' ' -> {
-                        if (!temp.toString().equals("")) {
+                        if (!temp.toString().isEmpty()) {
                             e1.push(Double.parseDouble(temp.toString()));
                         }
                         temp = new StringBuilder();
@@ -144,46 +145,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         catch (Exception e){
             return "Err";
-        }
-    }
-    public class Stack {
-        public  int top=-1;
-        void push(char d) {
-            top=top+1;
-            s[top] = d;
-        }
-        char pop() {
-            char d = s[top];
-            top = top - 1;
-            return d;
-        }
-        int priority(char d) {
-            switch (d) {
-                case '*', '/' -> {
-                    return 2;
-                }
-                case '+', '-' -> {
-                    return 1;
-                }
-                default -> {
-                    return 0;
-                }
-            }
-        }
-    }
-    public class Evaluate {
-        public int top=-1;
-        void push(double d) {
-            top=top+1;
-            e[top] = d;
-        }
-        double pop() {
-            if(top>-1) {
-                double d = e[top];
-                top=top-1;
-                return d;
-            }
-            return 0;
         }
     }
 }
